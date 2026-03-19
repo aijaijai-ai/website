@@ -3,31 +3,434 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>aijaijai</title>
+  <title>aijaijai — Skynet reports to us.</title>
+  <meta name="description" content="Compliance-first AI consulting. Process first. Platform second. Results, always." />
+  <link rel="icon" type="image/x-icon" href="assets/aijaijai-favicon.ico" />
+  <link rel="icon" type="image/png" sizes="32x32" href="assets/aijaijai-favicon-32.png" />
+  <link rel="icon" type="image/png" sizes="16x16" href="assets/aijaijai-favicon-16.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&display=swap" rel="stylesheet" />
   <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-      background: #0a0a0a;
-      color: #f0f0f0;
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      padding: 2rem;
-      text-align: center;
+    :root {
+      --bg:         #1d2021;
+      --bg-alt:     #282828;
+      --bg-warm:    #3c3836;
+      --fg:         #ebdbb2;
+      --gold:       #d79921;
+      --gold-bright:#fabd2f;
+      --green:      #689d6a;
+      --olive:      #98971a;
+      --teal:       #458588;
+      --red:        #cc241d;
+      --stone:      #928374;
     }
-    .logo { font-size: 2rem; font-weight: 700; letter-spacing: 0.05em; margin-bottom: 1.5rem; }
-    .tagline { font-size: 1.1rem; color: #aaa; max-width: 480px; line-height: 1.6; margin-bottom: 1rem; }
-    .what-we-do { font-size: 0.95rem; color: #777; max-width: 480px; line-height: 1.6; margin-bottom: 2.5rem; }
-    .coming-soon { font-size: 0.85rem; color: #555; letter-spacing: 0.1em; text-transform: uppercase; }
+
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'JetBrains Mono', monospace;
+      background: var(--bg);
+      color: var(--fg);
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ── WORDMARK ── */
+    .wordmark { font-family: 'JetBrains Mono', monospace; font-weight: 800; letter-spacing: -0.02em; line-height: 1; }
+    .wordmark .ai { color: var(--gold); }
+    .wordmark .j  { color: var(--fg); }
+
+    /* ── NAV ── */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1.25rem 2.5rem;
+      background: rgba(29, 32, 33, 0.92);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid rgba(146, 131, 116, 0.15);
+    }
+    .nav-left { display: flex; align-items: center; gap: 1rem; }
+    .nav-logo { width: 32px; height: 32px; object-fit: contain; }
+    .nav-wordmark { font-size: 1.25rem; }
+    .nav-tagline {
+      font-size: 0.65rem; color: var(--stone); font-style: italic;
+      font-weight: 300; margin-left: 0.5rem; display: none;
+    }
+    @media (min-width: 640px) { .nav-tagline { display: block; } }
+
+    /* ── BUTTONS ── */
+    .btn {
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 700; font-size: 0.75rem; letter-spacing: 0.08em;
+      text-transform: uppercase; text-decoration: none;
+      padding: 0.6rem 1.4rem;
+      border: 1.5px solid var(--gold);
+      color: var(--gold); background: transparent;
+      cursor: pointer; transition: background 0.2s, color 0.2s;
+      display: inline-block;
+    }
+    .btn:hover { background: var(--gold); color: var(--bg); }
+    .btn-solid { background: var(--gold); color: var(--bg); }
+    .btn-solid:hover { background: var(--gold-bright); border-color: var(--gold-bright); color: var(--bg); }
+
+    /* ── HERO ── */
+    /*
+      Strategy: <img> tag is the image source — it sizes naturally to its
+      own width, centered, with no cropping. Text blocks are absolutely
+      positioned as percentages of the IMAGE height, so they always sit
+      in the sky (top) and dust (bottom) zones regardless of zoom or
+      screen size.
+    */
+    #hero {
+      position: relative;
+      width: 100%;
+      background: var(--bg);
+      display: flex;
+      justify-content: center;
+    }
+
+    .hero-img-wrap {
+      position: relative;
+      width: 100%;
+      max-width: 900px; /* prevents the portrait image from going absurdly wide on large monitors */
+    }
+
+    .hero-img {
+      display: block;
+      width: 100%;
+      height: auto; /* preserves full image — no cropping */
+    }
+
+    /* Overlay: darken sky and ground, leave animals clear */
+    .hero-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(
+        to bottom,
+        rgba(29,32,33,0.65)  0%,
+        rgba(29,32,33,0.0)  28%,
+        rgba(29,32,33,0.0)  72%,
+        rgba(29,32,33,0.0) 100%
+      );
+      pointer-events: none;
+    }
+
+    /* SKY ZONE: top ~20% of image */
+    .hero-top {
+      position: absolute;
+      top: 5%;
+      left: 5%;
+      right: 5%;
+      z-index: 2;
+      opacity: 0;
+      animation: fadeUp 0.8s ease forwards 0.3s;
+    }
+
+    /* GROUND ZONE: bottom ~6% of image */
+    .hero-bottom {
+      position: absolute;
+      bottom: 3%;
+      left: 5%;
+      z-index: 2;
+      opacity: 0;
+      animation: fadeUp 0.8s ease forwards 0.6s;
+    }
+
+    .hero-eyebrow {
+      font-size: clamp(0.55rem, 1.2vw, 0.7rem);
+      font-weight: 500; letter-spacing: 0.2em;
+      text-transform: uppercase; color: var(--teal);
+      margin-bottom: 0.75rem;
+    }
+
+    .hero-headline {
+      font-size: clamp(1.4rem, 4vw, 3.5rem);
+      font-weight: 800; line-height: 1.05; color: var(--fg);
+    }
+    .hero-headline em { font-style: normal; color: var(--gold); }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(16px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ── SECTIONS ── */
+    section {
+      padding: 6rem 2.5rem;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+    .section-label {
+      font-size: 0.65rem; font-weight: 700; letter-spacing: 0.25em;
+      text-transform: uppercase; color: var(--teal); margin-bottom: 1rem;
+    }
+    .section-title {
+      font-size: clamp(1.5rem, 3vw, 2.5rem); font-weight: 800;
+      color: var(--fg); line-height: 1.1; margin-bottom: 1.5rem;
+    }
+    .section-title em { font-style: normal; color: var(--gold); }
+    .section-body {
+      font-size: 0.9rem; color: var(--stone); line-height: 1.8; max-width: 640px;
+    }
+
+    /* ── DIVIDER ── */
+    .divider {
+      width: calc(100% - 5rem); height: 1px;
+      background: linear-gradient(to right, transparent, var(--bg-warm), transparent);
+      margin: 0 auto; max-width: 1100px;
+    }
+
+    /* ── VALUE GRID ── */
+    .value-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1px; background: var(--bg-warm); border: 1px solid var(--bg-warm); margin-top: 3.5rem;
+    }
+    .value-card { background: var(--bg-alt); padding: 2rem 1.75rem; transition: background 0.2s; }
+    .value-card:hover { background: var(--bg-warm); }
+    .value-icon { font-size: 0.7rem; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase; color: var(--gold); margin-bottom: 0.75rem; }
+    .value-card h3 { font-size: 1rem; font-weight: 700; color: var(--fg); margin-bottom: 0.6rem; line-height: 1.3; }
+    .value-card p { font-size: 0.8rem; color: var(--stone); line-height: 1.7; }
+
+    /* ── SERVICES ── */
+    .services-img {
+      width: 100%; height: auto; margin: 3rem 0; border: 1px solid var(--bg-warm);
+    }
+    .process-steps {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 2rem; margin-top: 3rem;
+    }
+    .step { border-left: 2px solid var(--gold); padding-left: 1.5rem; }
+    .step-num { font-size: 0.65rem; font-weight: 700; letter-spacing: 0.2em; color: var(--gold); text-transform: uppercase; margin-bottom: 0.5rem; }
+    .step h3 { font-size: 1.05rem; font-weight: 700; color: var(--fg); margin-bottom: 0.5rem; }
+    .step p { font-size: 0.8rem; color: var(--stone); line-height: 1.7; }
+
+    /* ── FOUNDER ── */
+    #founder {
+      display: grid; grid-template-columns: 1fr; gap: 3rem;
+      max-width: 1100px; margin: 0 auto; padding: 6rem 2.5rem;
+    }
+    @media (min-width: 768px) { #founder { grid-template-columns: 1fr; align-items: center; max-width: 700px; } }
+    .founder-img {width: 100%;height: auto; border: 1px solid var(--bg-warm); }
+    .certs { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 2rem; }
+    .cert-tag { font-size: 0.65rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--teal); border: 1px solid var(--teal); padding: 0.3rem 0.75rem; }
+
+    /* ── CTA ── */
+    .cta-inner {
+      display: grid; grid-template-columns: 1fr; min-height: 480px; overflow: hidden;
+    }
+    @media (min-width: 768px) { .cta-inner { grid-template-columns: 1fr 1fr; } }
+    .cta-img-wrap { position: relative; overflow: hidden; min-height: 300px; }
+    .cta-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: center; }
+    .cta-img-overlay { position: absolute; inset: 0; background: linear-gradient(to right, transparent 60%, var(--bg-alt) 100%); }
+    .cta-content { background: var(--bg-alt); padding: 4rem 3rem; display: flex; flex-direction: column; justify-content: center; }
+    .cta-content .section-title { margin-bottom: 1rem; }
+    .cta-content .section-body  { margin-bottom: 2.5rem; }
+
+    /* ── FOOTER ── */
+    footer {
+      border-top: 1px solid var(--bg-warm); padding: 2.5rem 2.5rem;
+      display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 1rem;
+    }
+    .footer-left { display: flex; align-items: center; gap: 0.75rem; }
+    .footer-logo { width: 24px; height: 24px; object-fit: contain; }
+    .footer-wordmark { font-size: 1rem; }
+    .footer-tagline { font-size: 0.7rem; color: var(--stone); font-style: italic; font-weight: 300; }
+    .footer-right { font-size: 0.7rem; color: var(--stone); text-align: right; }
+
+    /* ── SCROLL REVEAL ── */
+    .reveal { opacity: 0; transform: translateY(24px); transition: opacity 0.7s ease, transform 0.7s ease; }
+    .reveal.visible { opacity: 1; transform: translateY(0); }
+
+    /* ── MOBILE ── */
+    @media (max-width: 640px) {
+      nav      { padding: 1rem 1.25rem; }
+      section  { padding: 4rem 1.25rem; }
+      #founder { padding: 3rem 1.25rem; }
+      footer   { padding: 2rem 1.25rem; }
+      .cta-content { padding: 2.5rem 1.5rem; }
+    }
   </style>
 </head>
 <body>
-  <div class="logo">aijaijai</div>
-  <p class="tagline"><!-- tagline coming soon --></p>
-  <p class="what-we-do"><!-- content coming soon --></p>
-  <p class="coming-soon">Coming Soon</p>
+
+  <!-- NAV -->
+  <nav>
+    <div class="nav-left">
+      <img src="assets/aijaijai-logo-transparent-clean.png" alt="aijaijai logo" class="nav-logo" />
+      <span class="wordmark nav-wordmark">
+        <span class="ai">ai</span><span class="j">j</span><span class="ai">ai</span><span class="j">j</span><span class="ai">ai</span>
+      </span>
+      <span class="nav-tagline">Skynet reports to us.</span>
+    </div>
+    <a href="https://www.linkedin.com/in/j-f-rudolph-w-4a55477b/" target="_blank" rel="noopener noreferrer" class="btn">Get in touch</a>
+  </nav>
+
+  <!-- HERO -->
+  <!-- Image is the layout anchor. Text positions are % of image height. -->
+  <div id="hero" style="padding-top:4rem;">
+    <div class="hero-img-wrap">
+
+      <!-- The full uncropped image — no background-size tricks -->
+      <img src="assets/aijaijai-hero-v3.png" alt="aijaijai — the wagon is rolling" class="hero-img" />
+
+      <!-- Darken sky only, leave animals untouched -->
+      <div class="hero-overlay"></div>
+
+      <!-- SKY ZONE: sits in the dark sky at the top of the image -->
+      <div class="hero-top">
+        <p class="hero-eyebrow">Compliance-first AI consulting</p>
+        <h1 class="hero-headline">
+          Less <em>aijaijai</em>.<br />More time for lunch.
+        </h1>
+      </div>
+
+      <!-- GROUND ZONE: floats above the dust at the bottom -->
+      <div class="hero-bottom">
+        <p style="font-size:clamp(0.8rem,2vw,1.1rem);font-weight:700;color:var(--fg);letter-spacing:0.05em;">Old problems. <em style="font-style:normal;color:var(--gold);">New oxen.</em></p>
+      </div>
+    </div>
+  </div>
+
+  <!-- VALUE PROP -->
+  <section id="value">
+    <p class="section-label reveal">Why aijaijai</p>
+    <h2 class="section-title reveal">The problem contains<br /><em>the solution.</em></h2>
+    <p class="section-body reveal">
+      We start with your processes — the real aijaijai, the grind that steals evenings and weekends. We build compliant platforms that force-multiply what your team already does best. Compliant by design. Measured by extraordinary results.
+    </p>
+    <div class="value-grid">
+      <div class="value-card reveal">
+        <p class="value-icon">01 — Compliant</p>
+        <h3>Built to pass the audit before the audit happens.</h3>
+        <p>Compliance by architecture — never bolted on. We design it in from day one so there is nothing to scramble for later.</p>
+      </div>
+      <div class="value-card reveal">
+        <p class="value-icon">02 — Scalable</p>
+        <h3>Scale like a startup. Comply like an enterprise.</h3>
+        <p>Sector-agnostic, scales with you. Startup to enterprise. Same rigour either way.</p>
+      </div>
+      <div class="value-card reveal">
+        <p class="value-icon">03 — Measured</p>
+        <h3>Results you can see on the dashboard.</h3>
+        <p>We win when you win. Higher throughput, same headcount, audit-ready growth without multiplying risk — always.</p>
+      </div>
+      <div class="value-card reveal">
+        <p class="value-icon">04 — Controlled</p>
+        <h3>The reins never leave your hands.</h3>
+        <p>We steer. AI pulls. Everyone arrives. You crack the whip. We make sure AI listens.</p>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- WHAT WE DO -->
+  <section id="services">
+    <p class="section-label reveal">What we do</p>
+    <h2 class="section-title reveal">Process first.<br />Platform second.<br /><em>Results, always.</em></h2>
+    <img src="assets/strongcoloursdangeroussnake.png" alt="aijaijai — full cast" class="services-img reveal" />
+    <div class="process-steps">
+      <div class="step reveal">
+        <p class="step-num">Process</p>
+        <h3>Business process evaluation and optimisation</h3>
+        <p>We map the real aijaijai — the grind, the bottlenecks, the manual work that steals your team's time. No assumptions. No shortcuts.</p>
+      </div>
+      <div class="step reveal">
+        <p class="step-num">Platform</p>
+        <h3>Compliant AI solution architecture and delivery</h3>
+        <p>We architect and deliver AI solutions built compliant from the ground up. Designed to optimise, scale, and force-multiply what your team already does best.</p>
+      </div>
+      <div class="step reveal">
+        <p class="step-num">Proof</p>
+        <h3>Training and adoption with measurable KPI outcomes</h3>
+        <p>Results you can count in the boardroom. More throughput. Same headcount. Audit ready. We do not deliver features — we deliver outcomes.</p>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- FOUNDER -->
+  <section id="founder">
+    <div class="reveal">
+      <img src="assets/ratelonbuffalloonly.png" alt="aijaijai — founder" class="founder-img" />
+    </div>
+    <div class="founder-text">
+      <p class="section-label reveal">The aijaijai story</p>
+      <h2 class="section-title reveal">Fifteen years of dust,<br />deadlines, and<br /><em>hard lessons.</em></h2>
+      <p class="section-body reveal">
+        It started on construction sites across South Africa — Tembisa Police Station, Northam Platinum Mine, MTN Group HQ, Transnet, and Telkom HQ. Every day was a risk assessment. Every missed step could be fatal. That is where compliance stopped being a checkbox. It became non-negotiable.
+      </p>
+      <p class="section-body reveal" style="margin-top:1rem;color:var(--stone);">
+        From there: SAP implementation training and GRC for Anglo American - Kumba Iron Ore. Followed by IT leadership and then five years at Amazon Web Services (AWS) — three supporting critical security incidents for hundreds of AWS customers, including Tesla, Apple, Capital One, JP Morgan, ABSA, Capitec, and Vodacom. Two years as Technical Program Manager, turning tooling ideas for an 8000+ person organisation into live deployments measured weekly on quantifiable cost savings and performance gains.
+      </p>
+      <p class="section-body reveal" style="margin-top:1rem;color:var(--stone);">
+        Construction gave reins made of steel. SAP gave the map of how giants really move. AWS Security gave global-scale compliance under fire. AWS TPM gave the discipline of measured outcomes, not promises.
+      </p>
+      <p class="section-body reveal" style="margin-top:1rem;color:var(--fg);font-weight:600;">
+        aijaijai is not a detour. It is where the trail was always leading.
+      </p>
+      <div class="certs reveal">
+        <span class="cert-tag">Certified Information Systems Security Professional (CISSP) — ISC2</span>
+        <span class="cert-tag">Offensive Security Certified Professional (OSCP) — OffSec</span>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- CTA -->
+  <section style="max-width:100%;padding:0;margin:0;">
+    <div class="cta-inner">
+      <div class="cta-img-wrap">
+        <img src="assets/ratelonbuffalohappylion.png" alt="aijaijai" class="cta-img" />
+        <div class="cta-img-overlay"></div>
+      </div>
+      <div class="cta-content">
+        <p class="section-label reveal">Ready to move forward</p>
+        <h2 class="section-title reveal">Start with a conversation.<br /><em>End at your dream destination.</em></h2>
+        <p class="section-body reveal">
+          The oxen pull with unrelenting power. The reins never leave your hands. Skynet reports to us.
+        </p>
+        <div class="reveal" style="margin-top:2.5rem;">
+          <a href="https://www.linkedin.com/in/j-f-rudolph-w-4a55477b/" target="_blank" rel="noopener noreferrer" class="btn btn-solid">Connect on LinkedIn</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-left">
+      <img src="assets/aijaijai-logo-transparent-clean.png" alt="aijaijai" class="footer-logo" />
+      <span class="wordmark footer-wordmark">
+        <span class="ai">ai</span><span class="j">j</span><span class="ai">ai</span><span class="j">j</span><span class="ai">ai</span>
+      </span>
+      <span class="footer-tagline">&nbsp;— Skynet reports to us.</span>
+    </div>
+    <div class="footer-right">
+      <p style="color:var(--stone);font-size:0.65rem;">aijaijai (Pty) Ltd &nbsp;·&nbsp; South Africa</p>
+      <p style="color:var(--stone);font-size:0.6rem;margin-top:0.25rem;">© 2026 aijaijai (Pty) Ltd. All rights reserved. Images may not be reproduced without written permission.</p>
+    </div>
+  </footer>
+
+  <script>
+    const reveals = document.querySelectorAll('.reveal');
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.12 });
+    reveals.forEach(el => observer.observe(el));
+  </script>
+
 </body>
 </html>
